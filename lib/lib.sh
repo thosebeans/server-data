@@ -69,3 +69,24 @@ _log() (
     fi
     printf '%s\n' "$out"
 )
+
+export TRY_FILE="$(mktemp)"
+trap "rm ${TRY_FILE}" EXIT
+
+_try() (
+    "$@"
+    c=$?
+    if [ $c -ne 0 ]; then
+        printf '%d %s\n' "$c" "$*" >> "$TRY_FILE"
+    fi
+    return $c
+)
+
+_catch() {
+    if [ "$(cat "$TRY_FILE")" = '' ]; then
+        return 1
+    fi
+    cat "$TRY_FILE"
+    printf '' > "$TRY_FILE"
+    return 0
+}
