@@ -1,0 +1,39 @@
+#!/usr/bin/sh
+
+COMMIT_MSG_FILE=$1
+
+_removeCommentLines() {
+    awk '
+    $0 ~ /^[^#]/ {
+        print;
+    }
+    $0 ~ /^$/ {
+        print;
+    }
+    ' -
+}
+
+cat "$COMMIT_MSG_FILE" | awk '
+$0 ~ /^[^#]/ {
+    print;
+}
+
+$0 ~ /^$/ {
+    print;
+}
+' -
+
+if ! cat "$COMMIT_MSG_FILE" | _removeCommentLines | head -n 1 | grep '^[^:( ]\+\((.\+)\)\?:\s[^ ].*' >/dev/null; then
+    echo 'invalid header'
+    exit 1
+fi
+
+if [ ! "$(cat "$COMMIT_MSG_FILE" | _removeCommentLines | head -n 2 | tail -n 1)" = '' ]; then
+    echo 'missing newline'
+    exit 1
+fi
+
+if [ "$(cat "$COMMIT_MSG_FILE" | _removeCommentLines | head -n 3 | tail -n 1)" = '' ]; then
+    echo 'missing body'
+    exit 1
+fi
