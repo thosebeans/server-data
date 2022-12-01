@@ -41,3 +41,31 @@ _quote() {
         sed 's|\\n$||g'
     printf '"'
 }
+
+_log() (
+    if ! printf '%s' "$1" | grep '^[A-Z]\{3\}$' >/dev/null; then
+        _error 'invalid status'
+        return 1
+    fi
+    if [ $# -lt 2 ]; then
+        _error 'missing message'
+        return 1
+    fi
+    out="$(date '+%Y-%m-%d %H-%M-%S'): ${1}: ${2}:"
+    if [ $# -gt 2 ]; then
+        if [ $(($# % 2)) -eq 1 ]; then
+            _error 'invalid number of arguments'
+            return 1
+        fi
+        for i in $(_range 3 $#); do
+            s=''
+            eval "s=\"\$${i}\""
+            if [ $(($i % 2)) -eq 1 ]; then
+                out="${out} $(_quote "$s")="
+            else
+                out="${out}$(_quote "$s")"
+            fi
+        done
+    fi
+    printf '%s\n' "$out"
+)
