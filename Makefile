@@ -1,10 +1,11 @@
-LIB = 1
-
 default:
 	@ \
+	printf '%s\n' "targets:"; \
 	cat ./Makefile | \
 	grep '^[^ 	]\+:' | \
 	sed 's|:$$||g'
 
-git:
+git: .PHONY
 	git config core.hooksPath "$$(pwd)/git/hooks"
+
+.PHONY:
