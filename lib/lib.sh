@@ -134,3 +134,25 @@ _catch() {
     printf '' > "$TRY_FILE"
     return 0
 }
+
+_depcheck() (
+    _log INF 'checking dependencies'
+    if [ $# -eq 0 ]; then
+        return 0
+    fi
+    missing=''
+    for i in $(_range 1 $#); do
+        s=''
+        eval "s=\"\$${i}\""
+        if ! which "$s" >/dev/null; then
+            if [ ! "$missing" = '' ]; then
+                missing="${missing} "
+            fi
+            missing="${missing}${s}"
+        fi
+    done
+    if [ ! "$missing" = '' ]; then
+        _log ERR 'missing dependencies' deps "$missing"
+        return 1
+    fi
+)
