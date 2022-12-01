@@ -27,3 +27,17 @@ _range() (
     done
     printf '%d\n' "$i"
 )
+
+_quote() {
+    if [ $# -gt 0 ]; then
+        printf '%s' "$1" | _quote
+        return 0
+    fi
+    printf '"'
+    sed 's|\\|\\\\|g' |
+        sed 's|"|\\"|g' |
+        sed 's|$|\\n|g' |
+        tr -d '\n' |
+        sed 's|\\n$||g'
+    printf '"'
+}
