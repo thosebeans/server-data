@@ -4,6 +4,26 @@ _error() {
     printf '!!! %s !!!\n' "$1"
 }
 
+_countLines() {
+    if [ $# -gt 0 ]; then
+        printf '%s' "$1" | _countLines
+        return 0
+    fi
+    awk '
+        BEGIN {
+            c = 0;
+        }
+
+        1 == 1 {
+            c += 1;
+        }
+
+        END {
+            print c;
+        }
+    '
+}
+
 _range() (
     if [ $# -lt 1 ]; then
         _error 'missing start'
