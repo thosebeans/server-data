@@ -24,6 +24,30 @@ _countLines() {
     '
 }
 
+_getLine() {
+    if ! printf '%s' "$1" | grep '^[0-9]\+$' >/dev/null; then
+        _error 'invalid line'
+        return 1
+    fi
+    if [ $# -gt 1 ]; then
+        printf '%s' "$2" | _getLine "$1"
+        return $?
+    fi
+    awk "
+        BEGIN {
+            c = 0;
+        }
+
+        c == ${1} {
+            print \$0;
+        }
+
+        1 == 1 {
+            c += 1;
+        }
+    "
+}
+
 _range() (
     if [ $# -lt 1 ]; then
         _error 'missing start'
